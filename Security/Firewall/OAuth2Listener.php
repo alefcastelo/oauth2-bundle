@@ -60,8 +60,14 @@ final class OAuth2Listener
     {
         $request = $this->httpMessageFactory->createRequest($event->getRequest());
 
-        if (!$request->hasHeader('Authorization')) {
+        $queryParams = $request->getQueryParams();
+
+        if (!$request->hasHeader('Authorization') && empty($queryParams['token'])) {
             return;
+        }
+
+        if (!empty($queryParams['token'])) {
+            $request = $request->withHeader('Authorization', sprintf('Bearer %s', $queryParams['token']));
         }
 
         try {
